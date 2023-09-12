@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -21,8 +22,11 @@ export class PostsController {
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@Query('page') page: number, @Query('cnt') cnt: number) {
+    if (!cnt) {
+      cnt = 10;
+    }
+    return this.postsService.findAll(page, cnt);
   }
 
   @Get(':id')

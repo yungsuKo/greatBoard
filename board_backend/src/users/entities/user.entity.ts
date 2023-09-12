@@ -1,11 +1,15 @@
-import { Post } from 'src/posts/entities/post.entity';
+import { Post } from '../../posts/entities/post.entity';
 import {
   Column,
   CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+@Entity({ name: 'user' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,7 +20,7 @@ export class User {
   @Column()
   password: string;
 
-  @Column('text')
+  @Column({ default: '' })
   description: string;
 
   @CreateDateColumn()
@@ -25,6 +29,6 @@ export class User {
   @UpdateDateColumn()
   updateDate: Date;
 
-  @Column()
-  posts: Post[];
+  @OneToMany(() => Post, (post) => post.user)
+  post: string;
 }
