@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Header from './Components/Header';
 import Content from './Components/Content';
@@ -67,48 +67,53 @@ export default class App extends Component {
     return (
       <Router basename="/">
         <div className="App">
-          <Route path="*" render={(props) => <Header {...props} />} />
-          <Route
-            exact
-            path="/"
-            render={() => (
-              <Content
-                posts={this.state.posts}
-                bookmarks={this.state.posts.filter((post) => post.bookmark)}
-                handleBookmark={this.handleBookmark}
-                handleRemoveBookmark={this.handleRemoveBookmark}
-              />
-            )}
-          />
-          <Route
-            exact
-            path="/new"
-            render={() => <NewStory handleSubmission={this.handleSubmission} />}
-          />
-          <Route
-            exact
-            path="/bookmark"
-            render={() => (
-              <Bookmark
-                bookmarks={this.state.posts.filter((post) => post.bookmark)}
-              />
-            )}
-          />
-          <Route
-            exact
-            path="/post/:id"
-            render={(props) => (
-              <SinglePost
-                {...props}
-                posts={this.state.posts}
-                handleBookmark={this.handleBookmark}
-                handleRemoveBookmark={this.handleRemoveBookmark}
-                handleRemove={this.handleRemove}
-                handleWindow={this.handleWindow()}
-              />
-            )}
-          />
-          <Route exact path="/login" render={(props) => <Login />} />
+          <Header match={'/'} />
+          <Routes>
+            {/* <Route path="*" element={} /> */}
+            <Route
+              exact
+              path="/"
+              element={
+                <Content
+                  posts={this.state.posts}
+                  bookmarks={this.state.posts.filter((post) => post.bookmark)}
+                  handleBookmark={this.handleBookmark}
+                  handleRemoveBookmark={this.handleRemoveBookmark}
+                />
+              }
+            />
+            <Route
+              exact
+              path="/new"
+              render={() => (
+                <NewStory handleSubmission={this.handleSubmission} />
+              )}
+            />
+            <Route
+              exact
+              path="/bookmark"
+              render={() => (
+                <Bookmark
+                  bookmarks={this.state.posts.filter((post) => post.bookmark)}
+                />
+              )}
+            />
+            <Route
+              exact
+              path="/post/:id"
+              element={(props) => (
+                <SinglePost
+                  {...props}
+                  posts={this.state.posts}
+                  handleBookmark={this.handleBookmark}
+                  handleRemoveBookmark={this.handleRemoveBookmark}
+                  handleRemove={this.handleRemove}
+                  handleWindow={this.handleWindow()}
+                />
+              )}
+            />
+            <Route exact path="/login" element={<Login />} />
+          </Routes>
           <Footer />
         </div>
       </Router>

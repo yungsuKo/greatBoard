@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { REGISTER_USER } from '../_actions/types';
+import { authUser } from '../_actions/userAction';
+import { useNavigate } from 'react-router-dom';
+axios.defaults.withCredentials = true;
 
-export default () => {
+export default (props) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [account, setAccount] = useState({
     username: '',
     password: '',
@@ -22,21 +30,12 @@ export default () => {
     if (Object.values(errors).some((v) => v)) {
       return;
     }
+    // const { access_token } = authUser(account);
+    dispatch(authUser(account)).then((res) => {
+      alert('로그인이 완료되었습니다.');
 
-    fetch('http://127.0.0.1:4000/auth', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify(account),
-    })
-      .then((res) => {
-        console.log(res);
-        return res.json();
-      })
-      .then((res) => {
-        console.log(res);
-      });
+      navigate('/');
+    });
   };
   const validate = (account) => {
     const errors = {
