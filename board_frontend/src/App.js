@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useContext, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Header from './Components/Header';
@@ -11,6 +11,7 @@ import Footer from './Components/Footer';
 import './App.css';
 import data from './data';
 import Login from './Components/Login';
+import { userContext } from './store';
 
 export default class App extends Component {
   constructor(props) {

@@ -26,6 +26,7 @@ export default ({ match: { url } }) => {
             <Link to="/bookmark" className="btn btn-bookmarks">
               Bookmarks
             </Link>
+            {}
             <Link to="/login" className="btn btn-login">
               Login
             </Link>
