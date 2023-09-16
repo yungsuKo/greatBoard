@@ -11,7 +11,6 @@ import Footer from './Components/Footer';
 import './App.css';
 import data from './data';
 import Login from './Components/Login';
-import { userContext } from './store';
 
 export default class App extends Component {
   constructor(props) {
@@ -52,11 +51,11 @@ export default class App extends Component {
     this.setState({ posts });
   }
 
-  handleRemove(post, history) {
+  handleRemove(post, navigate) {
     let posts = this.state.posts;
     posts = posts.filter((onepost) => onepost !== post);
     this.setState({ posts });
-    history.push('/');
+    navigate('/');
     this.handleWindow();
   }
 
@@ -70,7 +69,6 @@ export default class App extends Component {
         <div className="App">
           <Header match={'/'} />
           <Routes>
-            {/* <Route path="*" element={} /> */}
             <Route
               exact
               path="/"
@@ -86,32 +84,29 @@ export default class App extends Component {
             <Route
               exact
               path="/new"
-              render={() => (
-                <NewStory handleSubmission={this.handleSubmission} />
-              )}
+              element={<NewStory handleSubmission={this.handleSubmission} />}
             />
             <Route
               exact
               path="/bookmark"
-              render={() => (
+              element={
                 <Bookmark
                   bookmarks={this.state.posts.filter((post) => post.bookmark)}
                 />
-              )}
+              }
             />
             <Route
               exact
               path="/post/:id"
-              element={(props) => (
+              element={
                 <SinglePost
-                  {...props}
                   posts={this.state.posts}
                   handleBookmark={this.handleBookmark}
                   handleRemoveBookmark={this.handleRemoveBookmark}
                   handleRemove={this.handleRemove}
                   handleWindow={this.handleWindow()}
                 />
-              )}
+              }
             />
             <Route exact path="/login" element={<Login />} />
           </Routes>
