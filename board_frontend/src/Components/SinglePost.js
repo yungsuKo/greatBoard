@@ -1,21 +1,26 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import renderHTML from 'react-render-html';
 import { useNavigate, useParams } from 'react-router-dom';
 
-export default ({
-  posts,
-  handleBookmark,
-  handleRemoveBookmark,
-  handleRemove,
-}) => {
+export default ({ handleBookmark, handleRemoveBookmark, handleRemove }) => {
   let { id } = useParams();
-  let post = posts.filter((post) => post.id === id);
-  post = post[0];
+  const [post, setPost] = useState({
+    title: 'asdfasdf',
+    description: 'asdfasdf',
+  });
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_BASE_URL}/posts/${id}`).then((res) => {
+      setPost({ ...post, ...res.data });
+    });
+  });
   const navigate = useNavigate();
+
   return (
     <div className="single-post">
       <h1 className="header">{post.title}</h1>
-      {renderHTML(post.body)}
+      {renderHTML(post.description)}
       <ul className="post-foot">
         <li>
           {post.bookmark ? (
