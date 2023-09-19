@@ -7,20 +7,22 @@ import InlineStyleControls from './RichText/InlineStyleControls';
 
 import '../RichText.css';
 import axios from 'axios';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 export default () => {
   const { id } = useParams();
-  const [post, setPost] = useState(
+  const [editPost, setEditPost] = useState(
     axios.get(`${process.env.REACT_APP_BASE_URL}/posts/${id}`).then((res) => {
       return res.data;
     })
   );
+  const navigate = useNavigate();
+
   useEffect(() => {
     try {
       axios.get(`${process.env.REACT_APP_BASE_URL}/posts/${id}`).then((res) => {
         console.log(res);
-        setPost(res.data);
+        setEditPost(res.data);
       });
     } catch (e) {
       console.log(e);
@@ -28,20 +30,33 @@ export default () => {
   }, []);
 
   const onChange = (e) => {
-    setPost({ ...post, [e.target.name]: e.target.value });
-    console.log(post);
+    setEditPost({ ...editPost, [e.target.name]: e.target.value });
   };
 
-  console.log(post);
+  const editSubmit = async () => {
+    await axios.patch(
+      `${process.env.REACT_APP_BASE_URL}/posts/${id}`,
+      editPost,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      }
+    );
+    navigate(`/post/${id}`);
+  };
+
   return (
     <div>
       <div>
-        <input value={post.title} name="title" onChange={onChange} />
+        <input value={editPost.title} name="title" onChange={onChange} />
       </div>
       <div>
-        <input value={post.description} name="description" />
+        <input value={editPost.description} name="description" />
       </div>
-      <button className="btn btn-submit">Edit</button>
+      <button className="btn btn-submit" onClick={editSubmit}>
+        Edit
+      </button>
     </div>
   );
 };
