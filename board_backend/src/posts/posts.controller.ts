@@ -7,26 +7,31 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  @UseGuards(AuthGuard('access'))
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postsService.create(createPostDto);
+  create(@Request() req, @Body() createPostDto: CreatePostDto) {
+    const { userId } = req.user;
+    return this.postsService.create(createPostDto, userId);
   }
 
   @Get()
-  findAll(@Query('page') page: number, @Query('cnt') cnt: number) {
+  async findAll(@Query('page') page: number, @Query('cnt') cnt: number) {
     if (!cnt) {
       cnt = 10;
     }
-    return this.postsService.findAll(page, cnt);
+    return await this.postsService.findAll(page, cnt);
   }
 
   @Get(':id')
@@ -34,9 +39,24 @@ export class PostsController {
     return this.postsService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard('access'))
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  update(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    console.log(updatePostDto);
+    return this.postsService.update(+id, updatePostDto, req.user);
+  }
+
+  @Post('/bookmark/:id')
+  setBookmark(
+    @Param('id') id: string,
+    @Body('isBookmarked') isBookmarked: boolean,
+  ) {
+    console.log(isBookmarked);
+    return this.postsService.setBookmark(+id, isBookmarked);
   }
 
   @Delete(':id')

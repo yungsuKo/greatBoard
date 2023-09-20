@@ -13,33 +13,43 @@ export class PostsService {
     private postRepository: Repository<Post>,
   ) {}
 
-  create(createPostDto: CreatePostDto) {
+  async create(createPostDto: CreatePostDto, userId: number) {
     console.log(createPostDto);
-
-    return this.postRepository.save({ ...createPostDto });
+    return await this.postRepository.save({
+      ...createPostDto,
+      user: { id: userId },
+    });
   }
 
   async findAll(page, cnt) {
     const posts = await this.postRepository.find({
       take: cnt,
-      skip: (page - 1) * 10,
+      skip: page ? (page - 1) * 10 : 0,
     });
-    return `This action returns all posts`;
+    return posts;
   }
 
   async findOne(id: number) {
     const post = await this.postRepository.findOne({ where: { id } });
-    return `This action returns a #${id} post`;
+    return post;
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto) {
+  async update(id: number, updatePostDto: UpdatePostDto, user: any) {
     const post = await this.postRepository.findOne({ where: { id } });
     const newPost = { ...post, ...updatePostDto };
 
-    return await this.postRepository.save(newPost);
+    return await this.postRepository.save({ ...newPost, user: user.id });
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    await this.postRepository.softDelete({ id });
     return `This action removes a #${id} post`;
+  }
+
+  async setBookmark(id: number, isBookmarked: boolean) {
+    console.log(isBookmarked);
+    const post = await this.postRepository.findOne({ where: { id } });
+    post.isBookmarked = isBookmarked;
+    return await this.postRepository.update({ id }, post);
   }
 }
