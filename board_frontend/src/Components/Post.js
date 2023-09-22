@@ -1,10 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import renderHTML from 'react-render-html';
 import { Link } from 'react-router-dom';
 import { leveningStr } from '../helper';
+import axios from 'axios';
 
-export default ({ post, handleBookmark, handleRemoveBookmark }) => {
-  const { id, title, description, bookmark } = post;
+export default ({ post }) => {
+  const { id, title, description } = post;
+  const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
+
+  const handleRemoveBookmark = async (data) => {
+    const post = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/posts/bookmark/${data.id}`,
+      {
+        isBookmarked: false,
+      }
+    );
+    setIsBookmarked(post.data.isBookmarked);
+  };
+
+  const handleBookmark = async (data) => {
+    const post = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/posts/bookmark/${data.id}`,
+      {
+        isBookmarked: true,
+      }
+    );
+    setIsBookmarked(post.data.isBookmarked);
+  };
+
   return (
     <div className="post">
       <h3>
@@ -18,17 +41,17 @@ export default ({ post, handleBookmark, handleRemoveBookmark }) => {
           </Link>
         </li>
         <li>
-          {bookmark ? (
+          {isBookmarked ? (
             <button
               className="btn btn-remove-bookmarks"
-              onClick={() => handleRemoveBookmark(post)}
+              onClick={async () => await handleRemoveBookmark(post)}
             >
               Remove from Bookmark
             </button>
           ) : (
             <button
               className="btn btn-bookmarks"
-              onClick={() => handleBookmark(post)}
+              onClick={async () => await handleBookmark(post)}
             >
               Add to Bookmark
             </button>

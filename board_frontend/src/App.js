@@ -1,5 +1,11 @@
-import React, { Component, useContext, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 
 import Header from './Components/Header';
 import Content from './Components/Content';
@@ -11,6 +17,9 @@ import Footer from './Components/Footer';
 import './App.css';
 import data from './data';
 import Login from './Components/Login';
+import My from './Components/My';
+import axios from 'axios';
+import EditPost from './Components/EditPost';
 
 export default class App extends Component {
   constructor(props) {
@@ -19,30 +28,13 @@ export default class App extends Component {
       posts: data,
     };
 
-    this.handleBookmark = this.handleBookmark.bind(this);
-    this.handleRemoveBookmark = this.handleRemoveBookmark.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
   }
 
-  handleBookmark(data) {
-    let posts = this.state.posts;
-    posts = posts.map((post) =>
-      post === data
-        ? { id: post.id, title: post.title, body: post.body, bookmark: true }
-        : post
-    );
-    this.setState({ posts });
-  }
-
-  handleRemoveBookmark(data) {
-    let posts = this.state.posts;
-    posts = posts.map((post) =>
-      post === data
-        ? { id: post.id, title: post.title, body: post.body, bookmark: false }
-        : post
-    );
-    this.setState({ posts });
+  handleParams() {
+    const { id } = useParams();
+    return id;
   }
 
   handleSubmission(data) {
@@ -51,10 +43,10 @@ export default class App extends Component {
     this.setState({ posts });
   }
 
-  handleRemove(post, navigate) {
-    let posts = this.state.posts;
-    posts = posts.filter((onepost) => onepost !== post);
-    this.setState({ posts });
+  async handleRemove(post, navigate) {
+    let { id } = post;
+    await axios.delete(`${process.env.REACT_APP_BASE_URL}/posts/${id}`);
+
     navigate('/');
     this.handleWindow();
   }
@@ -88,6 +80,16 @@ export default class App extends Component {
             />
             <Route
               exact
+              path="/post/:id/edit"
+              element={
+                <EditPost
+                  handleSubmission={this.handleSubmission}
+                  id={this.handleParams}
+                />
+              }
+            />
+            <Route
+              exact
               path="/bookmark"
               element={
                 <Bookmark
@@ -100,7 +102,6 @@ export default class App extends Component {
               path="/post/:id"
               element={
                 <SinglePost
-                  posts={this.state.posts}
                   handleBookmark={this.handleBookmark}
                   handleRemoveBookmark={this.handleRemoveBookmark}
                   handleRemove={this.handleRemove}
@@ -109,6 +110,7 @@ export default class App extends Component {
               }
             />
             <Route exact path="/login" element={<Login />} />
+            <Route exact path="/my" element={<My />} />
           </Routes>
           <Footer />
         </div>
