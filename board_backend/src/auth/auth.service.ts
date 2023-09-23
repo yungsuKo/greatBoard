@@ -18,10 +18,23 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
-    const payload = { username: user.username, sub: user.userId };
+  async generateAccessToken(user: any) {
+    const payload = { username: user.email, sub: user.id };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        secret: process.env.JWT_ACCESS_TOKEN_SECRET,
+        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION,
+      }),
+    };
+  }
+
+  async generateRefreshToken(user: any) {
+    const payload = { username: user.email, sub: user.id };
+    return {
+      refresh_token: this.jwtService.sign(payload, {
+        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION,
+      }),
     };
   }
 }
