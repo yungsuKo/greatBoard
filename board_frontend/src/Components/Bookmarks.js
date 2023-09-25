@@ -1,18 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { leveningStr } from '../helper';
+import axios from 'axios';
 
-export default ({ bookmarks }) => {
-  const { length } = bookmarks;
+export default () => {
+  const [bookmarks, setBookmarks] = useState([]);
+  const getData = async () => {
+    const result = await axios.get(
+      `${process.env.REACT_APP_BASE_URL}/posts?bookmark=1`
+    );
+    console.log(result);
+    return result.data;
+  };
+
+  useEffect(() => {
+    getData().then((data) => setBookmarks(data));
+  }, []);
+
+  const length = bookmarks.length;
+  console.log(length);
   const showPost =
     length > 0 ? (
-      bookmarks.map(({ id, title, body }, index) => (
+      bookmarks.map(({ id, title, description }, index) => (
         <div key={id} className="bookmark">
           <span className="number">{index + 1}</span>
           <h5>
             <Link to={`/post/${id}`}>{title}</Link>
           </h5>
-          <p>{leveningStr(body, 35)}</p>
+          <p>{leveningStr(description, 35)}</p>
         </div>
       ))
     ) : (
