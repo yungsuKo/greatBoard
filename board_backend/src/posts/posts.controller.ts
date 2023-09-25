@@ -27,11 +27,15 @@ export class PostsController {
   }
 
   @Get()
-  async findAll(@Query('page') page: number, @Query('cnt') cnt: number) {
+  async findAll(
+    @Query('page') page: number,
+    @Query('cnt') cnt: number,
+    @Query('bookmark') bookmark: number,
+  ) {
     if (!cnt) {
       cnt = 10;
     }
-    return await this.postsService.findAll(page, cnt);
+    return await this.postsService.findAll(page, cnt, bookmark);
   }
 
   @Get(':id')
@@ -46,7 +50,6 @@ export class PostsController {
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    console.log(updatePostDto);
     return this.postsService.update(+id, updatePostDto, req.user);
   }
 
@@ -55,7 +58,6 @@ export class PostsController {
     @Param('id') id: string,
     @Body('isBookmarked') isBookmarked: boolean,
   ) {
-    console.log(isBookmarked);
     return this.postsService.setBookmark(+id, isBookmarked);
   }
 

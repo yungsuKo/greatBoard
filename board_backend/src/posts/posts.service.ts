@@ -14,18 +14,26 @@ export class PostsService {
   ) {}
 
   async create(createPostDto: CreatePostDto, userId: number) {
-    console.log(createPostDto);
     return await this.postRepository.save({
       ...createPostDto,
       user: { id: userId },
     });
   }
 
-  async findAll(page, cnt) {
-    const posts = await this.postRepository.find({
-      take: cnt,
-      skip: page ? (page - 1) * 10 : 0,
-    });
+  async findAll(page: number, cnt: number, bookmark: number) {
+    let posts = [];
+    if (bookmark == 1) {
+      posts = await this.postRepository.find({
+        where: {
+          isBookmarked: true,
+        },
+      });
+    } else {
+      posts = await this.postRepository.find({
+        take: cnt,
+        skip: page ? (page - 1) * 10 : 0,
+      });
+    }
     return posts;
   }
 
@@ -47,9 +55,10 @@ export class PostsService {
   }
 
   async setBookmark(id: number, isBookmarked: boolean) {
-    console.log(isBookmarked);
     const post = await this.postRepository.findOne({ where: { id } });
     post.isBookmarked = isBookmarked;
-    return await this.postRepository.update({ id }, post);
+    const updatedPost = await this.postRepository.save(post);
+
+    return updatedPost;
   }
 }
