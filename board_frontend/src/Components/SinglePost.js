@@ -1,14 +1,33 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import renderHTML from 'react-render-html';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-export default ({ handleBookmark, handleRemoveBookmark, handleRemove }) => {
+export default ({ handleRemove }) => {
   let { id } = useParams();
-  const [post, setPost] = useState({
-    title: 'asdfasdf',
-    description: 'asdfasdf',
-  });
+  const [post, setPost] = useState({ description: '' });
+
+  const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
+
+  const handleRemoveBookmark = async (data) => {
+    const post = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/posts/bookmark/${data.id}`,
+      {
+        isBookmarked: false,
+      }
+    );
+    setIsBookmarked(post.data.isBookmarked);
+  };
+
+  const handleBookmark = async (data) => {
+    const post = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/posts/bookmark/${data.id}`,
+      {
+        isBookmarked: true,
+      }
+    );
+    setIsBookmarked(post.data.isBookmarked);
+  };
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_BASE_URL}/posts/${id}`).then((res) => {
@@ -23,7 +42,7 @@ export default ({ handleBookmark, handleRemoveBookmark, handleRemove }) => {
       {renderHTML(post.description)}
       <ul className="post-foot">
         <li>
-          {post.bookmark ? (
+          {post.isBookmarked ? (
             <button
               className="btn btn-remove-bookmarks"
               onClick={() => handleRemoveBookmark(post)}
@@ -38,6 +57,14 @@ export default ({ handleBookmark, handleRemoveBookmark, handleRemove }) => {
               Add to Bookmark
             </button>
           )}
+        </li>
+        <li>
+          <Link
+            to={{ pathname: `edit`, state: { id } }}
+            className="btn btn-edit"
+          >
+            Edit
+          </Link>
         </li>
         <li>
           <button
