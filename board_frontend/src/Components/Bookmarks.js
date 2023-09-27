@@ -7,7 +7,12 @@ export default () => {
   const [bookmarks, setBookmarks] = useState([]);
   const getData = async () => {
     const result = await axios.get(
-      `${process.env.REACT_APP_BASE_URL}/posts?bookmark=1`
+      `${process.env.REACT_APP_BASE_URL}/posts?bookmark=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      }
     );
     console.log(result);
     return result.data;

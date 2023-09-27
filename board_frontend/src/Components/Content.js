@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import Posts from './Posts';
 import Bookmarks from './Bookmarks';
 import axios from 'axios';
+import { UserContext } from '../Contexts/userContext';
 
 export default ({ bookmarks, handleBookmark, handleRemoveBookmark }) => {
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState([]);
+  const { isLogin, accessToken } = useContext(UserContext);
   const getPosts = async (page) => {
     const { data } = await axios.get(
-      `${process.env.REACT_APP_BASE_URL}/posts?page=${page}`
+      `${process.env.REACT_APP_BASE_URL}/posts?page=${page}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
     );
     return data;
   };
@@ -20,7 +27,7 @@ export default ({ bookmarks, handleBookmark, handleRemoveBookmark }) => {
       setPosts(res);
     });
     console.log(posts);
-  }, [page]);
+  }, [page, accessToken]);
 
   return (
     <div className="content-area">

@@ -21,6 +21,7 @@ export function UserProvider({ children }) {
     if (accessToken !== '') {
       let decoded_token = jwt.decode(accessToken, { complete: true });
       let nowTime = new Date();
+      console.log(nowTime.getTime(), ',', decoded_token.payload.exp * 1000);
       if (nowTime.getTime() > decoded_token.payload.exp * 1000) {
         // refresh 토큰을 이용하여 요청 시도
         getAccess()
